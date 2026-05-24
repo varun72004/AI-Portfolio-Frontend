@@ -22,7 +22,7 @@ const LoginPage = () => {
     
     const navigate = useNavigate();
     const location = useLocation();
-    const { login, isAuthenticated } = useAuth();
+    const { login, isAuthenticated, checkAuth } = useAuth();
 
     const from = location.state?.from?.pathname || '/admin';
 
@@ -100,7 +100,10 @@ const LoginPage = () => {
             }, { withCredentials: true });
             
             if (response.data.id) {
-                window.location.href = from;
+                stopCamera();
+                // Re-check auth state so AuthContext picks up the new cookies
+                await checkAuth();
+                navigate(from, { replace: true });
             }
         } catch (err) {
             setError(err.response?.data?.detail || 'Face login failed. Please try password login.');
